@@ -856,6 +856,7 @@ open class EPUBNavigatorViewController: UIViewController,
             }
         }
     }
+    
 
     // MARK: - Configurable
 
@@ -991,6 +992,18 @@ extension EPUBNavigatorViewController: EPUBNavigatorViewModelDelegate {
 }
 
 extension EPUBNavigatorViewController: EPUBSpreadViewDelegate {
+    func spreadViewNextPages(_ spreadView: EPUBSpreadView) {
+        Task{
+            await goForward(options: .animated)
+        }
+    }
+    
+    func spreadViewBackPages(_ spreadView: EPUBSpreadView) {
+        Task{
+            await goBackward(options: .animated)
+        }
+    }
+    
     func spreadViewDidLoad(_ spreadView: EPUBSpreadView) {
         Task {
             let templates = config.decorationTemplates.reduce(into: [:]) { styles, item in

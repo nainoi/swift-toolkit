@@ -213,7 +213,7 @@ final class PaginationView: UIView, Loggable {
         delegate?.paginationViewDidUpdateViews(self)
     }
 
-    private func loadNextPage() async {
+    public func loadNextPage() async {
         guard let (index, location) = loadingIndexQueue.popFirst() else {
             return
         }

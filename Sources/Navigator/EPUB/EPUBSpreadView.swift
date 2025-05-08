@@ -29,6 +29,12 @@ protocol EPUBSpreadViewDelegate: AnyObject {
 
     /// Called when the pages visible in the spread changed.
     func spreadViewPagesDidChange(_ spreadView: EPUBSpreadView)
+    
+    /// Called when the pages visible in the spread changed.
+    func spreadViewNextPages(_ spreadView: EPUBSpreadView)
+    
+    /// Called when the pages visible in the spread changed.
+    func spreadViewBackPages(_ spreadView: EPUBSpreadView)
 
     /// Called when the spread view needs to present a view controller.
     func spreadView(_ spreadView: EPUBSpreadView, present viewController: UIViewController)

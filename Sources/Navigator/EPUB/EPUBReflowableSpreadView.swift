@@ -15,7 +15,8 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
     private var topConstraint: NSLayoutConstraint!
     private var bottomConstraint: NSLayoutConstraint!
 
-    private static let reflowableScript = loadScript(named: "readium-reflowable")
+    private static let reflowableScript = loadScript(
+        named: "readium-reflowable")
 
     required init(
         viewModel: EPUBNavigatorViewModel,
@@ -27,7 +28,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
             viewModel: viewModel,
             spread: spread,
             scripts: [
-                WKUserScript(source: Self.reflowableScript, injectionTime: .atDocumentStart, forMainFrameOnly: false),
+                WKUserScript(
+                    source: Self.reflowableScript,
+                    injectionTime: .atDocumentStart, forMainFrameOnly: false)
             ],
             animatedLoad: animatedLoad
         )
@@ -36,7 +39,7 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
     override func setupWebView() {
         super.setupWebView()
 
-        scrollView.bounces = false
+        scrollView.bounces = viewModel.scroll
         // Since iOS 16, the default value of alwaysBounceX seems to be true
         // for web views.
         scrollView.alwaysBounceVertical = false
@@ -47,7 +50,8 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         webView.translatesAutoresizingMaskIntoConstraints = false
         topConstraint = webView.topAnchor.constraint(equalTo: topAnchor)
         topConstraint.priority = .defaultHigh
-        bottomConstraint = webView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        bottomConstraint = webView.bottomAnchor.constraint(
+            equalTo: bottomAnchor)
         bottomConstraint.priority = .defaultHigh
         NSLayoutConstraint.activate([
             topConstraint, bottomConstraint,
@@ -61,14 +65,19 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         updateContentInset()
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(
+        _ previousTraitCollection: UITraitCollection?
+    ) {
         super.traitCollectionDidChange(previousTraitCollection)
         updateContentInset()
     }
 
     override func loadSpread() {
         guard spread.links.count == 1 else {
-            log(.error, "Only one document at a time can be displayed in a reflowable spread")
+            log(
+                .error,
+                "Only one document at a time can be displayed in a reflowable spread"
+            )
             return
         }
         let link = spread.leading
@@ -89,11 +98,14 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         if viewModel.scroll {
             topConstraint.constant = 0
             bottomConstraint.constant = 0
-            scrollView.contentInset = UIEdgeInsets(top: notchAreaInsets.top, left: 0, bottom: notchAreaInsets.bottom, right: 0)
+            scrollView.contentInset = UIEdgeInsets(
+                top: notchAreaInsets.top, left: 0,
+                bottom: notchAreaInsets.bottom, right: 0)
 
         } else {
             let contentInset = viewModel.config.contentInset
-            var insets = contentInset[traitCollection.verticalSizeClass]
+            var insets =
+                contentInset[traitCollection.verticalSizeClass]
                 ?? contentInset[.regular]
                 ?? contentInset[.unspecified]
                 ?? (top: 0, bottom: 0)
@@ -171,7 +183,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         }
     }
 
-    override func go(to direction: EPUBSpreadView.Direction, options: NavigatorGoOptions) async -> Bool {
+    override func go(
+        to direction: EPUBSpreadView.Direction, options: NavigatorGoOptions
+    ) async -> Bool {
         guard !viewModel.scroll else {
             return await super.go(to: direction, options: options)
         }
@@ -190,7 +204,7 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         newOffset.x += offsetX
         let rounded = round(newOffset.x / offsetX) * offsetX
         newOffset.x = rounded
-        guard 0 ..< scrollView.contentSize.width ~= newOffset.x else {
+        guard 0..<scrollView.contentSize.width ~= newOffset.x else {
             return false
         }
 
@@ -250,7 +264,10 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     @discardableResult
     private func go(to locator: Locator) async -> Bool {
-        guard ["", "#"].contains(locator.href.string) || spread.contains(href: locator.href) else {
+        guard
+            ["", "#"].contains(locator.href.string)
+                || spread.contains(href: locator.href)
+        else {
             log(.warning, "The locator's href is not in the spread")
             return false
         }
@@ -277,14 +294,17 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         // Note: The JS layer does not take into account the scroll view's content inset. So it can't be used to reliably scroll to the top or the bottom of the page in scroll mode.
         if viewModel.scroll, [0, 1].contains(progression) {
             var contentOffset = scrollView.contentOffset
-            contentOffset.y = (progression == 0)
+            contentOffset.y =
+                (progression == 0)
                 ? -scrollView.contentInset.top
-                : (scrollView.contentSize.height - scrollView.bounds.height + scrollView.contentInset.bottom)
+                : (scrollView.contentSize.height - scrollView.bounds.height
+                    + scrollView.contentInset.bottom)
             scrollView.contentOffset = contentOffset
             return true
         } else {
             let dir = viewModel.readingProgression.rawValue
-            await evaluateScript("readium.scrollToPosition(\'\(progression)\', \'\(dir)\')")
+            await evaluateScript(
+                "readium.scrollToPosition(\'\(progression)\', \'\(dir)\')")
             return true
         }
     }
@@ -327,7 +347,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     // Called by the javascript code to notify that scrolling ended.
     private func progressionDidChange(_ body: Any) {
-        guard spreadLoaded, let bodyString = body as? String, var newProgression = Double(bodyString) else {
+        guard spreadLoaded, let bodyString = body as? String,
+            var newProgression = Double(bodyString)
+        else {
             return
         }
         newProgression = min(max(newProgression, 0.0), 1.0)
@@ -343,7 +365,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
     private func setNeedsNotifyPagesDidChange() {
         // Makes sure we always receive the "ending scroll" event.
         // ie. https://stackoverflow.com/a/1857162/1474476
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(notifyPagesDidChange), object: nil)
+        NSObject.cancelPreviousPerformRequests(
+            withTarget: self, selector: #selector(notifyPagesDidChange),
+            object: nil)
         perform(#selector(notifyPagesDidChange), with: nil, afterDelay: 0.3)
     }
 
@@ -359,12 +383,16 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     override func registerJSMessages() {
         super.registerJSMessages()
-        registerJSMessage(named: "progressionChanged") { [weak self] in self?.progressionDidChange($0) }
+        registerJSMessage(named: "progressionChanged") { [weak self] in
+            self?.progressionDidChange($0)
+        }
     }
 
     // MARK: - WKNavigationDelegate
 
-    override func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    override func webView(
+        _ webView: WKWebView, didFinish navigation: WKNavigation!
+    ) {
         super.webView(webView, didFinish: navigation)
 
         // Fixes https://github.com/readium/r2-navigator-swift/issues/141 by disabling the native
@@ -379,6 +407,29 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        setNeedsNotifyPagesDidChange()
+        if(viewModel.scroll){
+            let offsetY = scrollView.contentOffset.y
+            let contentHeight = scrollView.contentSize.height
+            let frameHeight = scrollView.frame.size.height
+            // Check if scrolled to bottom
+            let offset = offsetY + frameHeight
+            if contentHeight > frameHeight - 40 {
+                if offset >= contentHeight + 150 {
+                    print("Next Chapter")
+                    delegate?.spreadViewNextPages(self)
+                    Task{
+                        await go(to: .left, options: .animated)
+                    }
+                }else if offsetY < -150 {
+                    delegate?.spreadViewBackPages(self)
+                    Task{
+                        await go(to: .right, options: .animated)
+                    }
+                }
+            }
+            
+        }else{
+            setNeedsNotifyPagesDidChange()
+        }
     }
 }

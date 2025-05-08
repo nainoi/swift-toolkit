@@ -44,6 +44,7 @@ class EPUBViewController: VisualReaderViewController<EPUBNavigatorViewController
                         title: "Highlight",
                         action: #selector(highlightSelection)
                     )),
+                disablePageTurnsWhileScrolling: true,
                 decorationTemplates: templates,
                 fontFamilyDeclarations: [
                     CSSFontFamilyDeclaration(
@@ -61,6 +62,7 @@ class EPUBViewController: VisualReaderViewController<EPUBNavigatorViewController
                         ]
                     ).eraseToAnyHTMLFontFamilyDeclaration(),
                 ]
+            
             ),
             httpServer: httpServer
         )
@@ -153,6 +155,7 @@ class EPUBViewController: VisualReaderViewController<EPUBNavigatorViewController
         let match = noterefTitleRegex.firstMatch(in: title, range: range)
         return match != nil
     }
+    
 }
 
 extension EPUBViewController: EPUBNavigatorDelegate {
