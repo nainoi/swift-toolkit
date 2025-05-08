@@ -414,13 +414,13 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
             // Check if scrolled to bottom
             let offset = offsetY + frameHeight
             if contentHeight > frameHeight - 40 {
-                if offset >= contentHeight + 150 {
+                if offset >= contentHeight + 100 {
                     print("Next Chapter")
                     delegate?.spreadViewNextPages(self)
                     Task{
                         await go(to: .left, options: .animated)
                     }
-                }else if offsetY < -150 {
+                }else if offsetY < -100 {
                     delegate?.spreadViewBackPages(self)
                     Task{
                         await go(to: .right, options: .animated)

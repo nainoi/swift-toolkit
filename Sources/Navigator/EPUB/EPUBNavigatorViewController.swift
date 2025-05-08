@@ -696,7 +696,7 @@ open class EPUBNavigatorViewController: UIViewController,
     private lazy var updateCurrentLocation = execute(
         // If we're not in an `idle` state, we postpone the notification.
         when: { [weak self] in self?.state == .idle },
-        pollingInterval: 0.1
+        pollingInterval: 0.01
     ) { [weak self] in
         guard let self = self else {
             return
@@ -709,8 +709,10 @@ open class EPUBNavigatorViewController: UIViewController,
             let location = currentLocation,
             location != notifiedCurrentLocation
         {
-            notifiedCurrentLocation = location
-            delegate.navigator(self, locationDidChange: location)
+            DispatchQueue.main.async{
+                self.notifiedCurrentLocation = location
+                delegate.navigator(self, locationDidChange: location)
+            }
         }
     }
 
