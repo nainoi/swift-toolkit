@@ -996,13 +996,13 @@ extension EPUBNavigatorViewController: EPUBNavigatorViewModelDelegate {
 extension EPUBNavigatorViewController: EPUBSpreadViewDelegate {
     func spreadViewNextPages(_ spreadView: EPUBSpreadView) {
         Task{
-            await goForward(options: .animated)
+            await goForward(options: .none)
         }
     }
     
     func spreadViewBackPages(_ spreadView: EPUBSpreadView) {
         Task{
-            await goBackward(options: .animated)
+            await goBackward(options: .none)
         }
     }
     

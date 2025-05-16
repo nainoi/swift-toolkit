@@ -44,7 +44,7 @@ class EPUBViewController: VisualReaderViewController<EPUBNavigatorViewController
                         title: "Highlight",
                         action: #selector(highlightSelection)
                     )),
-                disablePageTurnsWhileScrolling: true,
+                disablePageTurnsWhileScrolling: false,
                 decorationTemplates: templates,
                 fontFamilyDeclarations: [
                     CSSFontFamilyDeclaration(

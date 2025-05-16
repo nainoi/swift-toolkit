@@ -407,6 +407,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
+        guard spreadLoaded else {
+            return
+        }
         if(viewModel.scroll){
             let offsetY = scrollView.contentOffset.y
             let contentHeight = scrollView.contentSize.height
@@ -418,12 +421,12 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
                     print("Next Chapter")
                     delegate?.spreadViewNextPages(self)
                     Task{
-                        await go(to: .left, options: .animated)
+                        await go(to: .left, options: .none)
                     }
                 }else if offsetY < -100 {
                     delegate?.spreadViewBackPages(self)
                     Task{
-                        await go(to: .right, options: .animated)
+                        await go(to: .right, options: .none)
                     }
                 }
             }

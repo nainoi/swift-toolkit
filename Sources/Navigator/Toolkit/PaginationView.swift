@@ -315,9 +315,9 @@ final class PaginationView: UIView, Loggable {
             }
         }
 
-        await fade(to: 0)
+//        await fade(to: 0.8)
         await scrollToView(at: index, location: location)
-        await fade(to: 1)
+//        await fade(to: 1)
     }
 
     private func scrollToView(at index: Int, location: PageLocation) async {
