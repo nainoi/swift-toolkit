@@ -176,9 +176,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
             // The rendering is sometimes very slow. So in case we don't show the first page of the resource, we add
             // a generous delay before showing the spread again.
-            let delayed = !location.isStart
-            try? await Task.sleep(seconds: delayed ? 0.3 : 0)
-
+//            let delayed = !location.isStart
+//            try? await Task.sleep(seconds: delayed ? 0.3 : 0)
+//
             self.showSpread()
         }
     }
@@ -214,7 +214,7 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
         // the page turn is animated. The delay is roughly the length of the
         // animation.
         // TODO: completion should be implemented using scroll view delegates
-        try? await Task.sleep(seconds: 0.3)
+//        try? await Task.sleep(seconds: 0.3)
 
         return true
     }
