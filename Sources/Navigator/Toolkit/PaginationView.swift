@@ -304,7 +304,7 @@ final class PaginationView: UIView, Loggable {
         func fade(to alpha: CGFloat) async {
             if animated {
                 await withCheckedContinuation { continuation in
-                    UIView.animate(withDuration: 0.15, animations: {
+                    UIView.animate(withDuration: 0.05, animations: {
                         self.alpha = alpha
                     }) { _ in
                         continuation.resume()
