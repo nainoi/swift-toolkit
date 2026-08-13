@@ -222,8 +222,9 @@ public final class EPUBPreferencesEditor: StatefulPreferencesEditor<EPUBPreferen
                     && !$0.settings.publisherStyles
                     && $0.preferences.lineHeight != nil
             },
-            supportedRange: 1.0 ... 2.0,
-            progressionStrategy: .increment(0.1),
+            // ARNBOOK: widened from 1.0...2.0 with 0.1 increments.
+            supportedRange: 1.0 ... 3.0,
+            progressionStrategy: .increment(0.2),
             format: { $0.formatDecimal(maximumFractionDigits: 5) }
         )
 

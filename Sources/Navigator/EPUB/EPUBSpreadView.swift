@@ -29,6 +29,14 @@ protocol EPUBSpreadViewDelegate: AnyObject {
     /// Called when the pages visible in the spread changed.
     func spreadViewPagesDidChange(_ spreadView: EPUBSpreadView)
 
+    /// ARNBOOK: called when the reader over-scrolled past the bottom of a
+    /// scroll-mode spread and should move on to the next resource.
+    func spreadViewNextPages(_ spreadView: EPUBSpreadView)
+
+    /// ARNBOOK: called when the reader over-scrolled past the top of a
+    /// scroll-mode spread and should move back to the previous resource.
+    func spreadViewBackPages(_ spreadView: EPUBSpreadView)
+
     /// Called when the spread view needs to present a view controller.
     func spreadView(_ spreadView: EPUBSpreadView, present viewController: UIViewController)
 

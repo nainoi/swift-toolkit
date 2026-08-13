@@ -48,7 +48,10 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
     override func setupWebView() {
         super.setupWebView()
 
-        scrollView.bounces = false
+        // ARNBOOK: bouncing is what lets the reader over-scroll past the top or
+        // bottom edge in scroll mode, which is how we detect a chapter change
+        // in `scrollViewDidScroll`. Paginated mode keeps it disabled.
+        scrollView.bounces = viewModel.scroll
         // Since iOS 16, the default value of alwaysBounceX seems to be true
         // for web views.
         scrollView.alwaysBounceVertical = false
@@ -161,8 +164,9 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
         // The rendering is sometimes very slow. So in case we don't show the first page of the resource, we add
         // a generous delay before showing the spread again.
-        let delayed = !location.location.isStart
-        try? await Task.sleep(seconds: delayed ? 0.3 : 0)
+        // ARNBOOK: disabled — the extra 0.3s makes chapter changes feel laggy.
+//        let delayed = !location.location.isStart
+//        try? await Task.sleep(seconds: delayed ? 0.3 : 0)
     }
 
     override func go(to direction: EPUBSpreadView.Direction, options: NavigatorGoOptions) async -> Bool {
@@ -434,6 +438,36 @@ final class EPUBReflowableSpreadView: EPUBSpreadView {
 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         super.scrollViewDidScroll(scrollView)
-        setNeedsNotifyPagesDidChange()
+
+        guard isSpreadLoaded else {
+            return
+        }
+
+        // ARNBOOK: in scroll mode there are no page turns, so over-scrolling
+        // past either edge is what moves the reader between resources.
+        guard viewModel.scroll else {
+            setNeedsNotifyPagesDidChange()
+            return
+        }
+
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let frameHeight = scrollView.frame.size.height
+
+        guard contentHeight > frameHeight - 40 else {
+            return
+        }
+
+        if offsetY + frameHeight >= contentHeight + 100 {
+            delegate?.spreadViewNextPages(self)
+            Task {
+                await go(to: .left, options: .none)
+            }
+        } else if offsetY < -100 {
+            delegate?.spreadViewBackPages(self)
+            Task {
+                await go(to: .right, options: .none)
+            }
+        }
     }
 }

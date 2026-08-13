@@ -707,7 +707,9 @@ open class EPUBNavigatorViewController: InputObservableViewController,
     private lazy var updateCurrentLocation = execute(
         // If we're not in an `idle` state, we postpone the notification.
         when: { [weak self] in self?.state == .idle },
-        pollingInterval: 0.1
+        // ARNBOOK: tightened from 0.1 so the reading position reported to the
+        // Flutter side keeps up with fast scrolling.
+        pollingInterval: 0.01
     ) { [weak self] in
         guard let self = self else {
             return
@@ -1016,6 +1018,21 @@ extension EPUBNavigatorViewController: EPUBNavigatorViewModelDelegate {
 }
 
 extension EPUBNavigatorViewController: EPUBSpreadViewDelegate {
+    /// ARNBOOK: over-scrolling a scroll-mode spread moves to the adjacent
+    /// resource. `.none` keeps the transition instant — the fade/slide
+    /// animation reads as a flicker when it is driven by a scroll gesture.
+    func spreadViewNextPages(_ spreadView: EPUBSpreadView) {
+        Task {
+            await goForward(options: .none)
+        }
+    }
+
+    func spreadViewBackPages(_ spreadView: EPUBSpreadView) {
+        Task {
+            await goBackward(options: .none)
+        }
+    }
+
     func spreadViewContentInset(_ spreadView: EPUBSpreadView) -> UIEdgeInsets {
         if let inset = delegate?.navigatorContentInset(self) {
             return inset
